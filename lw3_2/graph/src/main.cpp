@@ -8,7 +8,6 @@ int main()
 	{
 		Graph graph;
 		graph.LoadFromFile("input.txt");
-
 		auto sccs = graph.FindStronglyConnectedComponents();
 		const auto& names = graph.GetVertexNames(); // getting map index -> name
 

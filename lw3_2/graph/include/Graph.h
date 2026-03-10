@@ -18,7 +18,7 @@ public:
 	using IntVector = std::vector<int>;
 	using BoolVector = std::vector<bool>;
 
-	explicit Graph(int vertexCount = 0);
+	explicit Graph(int vertexCount = 0); // 0 by default
 
 	void LoadFromFile(const std::string& filename);
 
@@ -28,7 +28,7 @@ public:
 
 	[[nodiscard]] const AdjMatrix& GetAdjacencyMatrix() const;
 
-	// Helper to get name by index if needed later
+	// Helper to get name by index
 	[[nodiscard]] const std::vector<std::string>& GetVertexNames() const { return m_vertexNames; }
 
 private:
