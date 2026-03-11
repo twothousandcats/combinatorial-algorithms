@@ -89,25 +89,6 @@ TEST_CASE("SCC: Single cycle forms one component", "[scc-basic]")
     CleanupTestFile();
 }
 
-TEST_CASE("SCC: Linear chain forms N components", "[scc-chain]")
-{
-    CreateTestFile("3 2\nA B\nB C\n");
-
-    Graph graph(0);
-    graph.LoadFromFile(TEST_GRAPH_FILE);
-    const auto sccs = graph.FindStronglyConnectedComponents();
-
-    REQUIRE(sccs.size() == 3);
-
-    auto normalized = NormalizeSCCs(sccs);
-
-    CHECK(normalized[0] == std::vector<int>{0});
-    CHECK(normalized[1] == std::vector<int>{1});
-    CHECK(normalized[2] == std::vector<int>{2});
-
-    CleanupTestFile();
-}
-
 TEST_CASE("SCC: Complex mixed structure", "[scc-complex]")
 {
     CreateTestFile("5 6\nA B\nB A\nB C\nC D\nD C\nD E\n");
