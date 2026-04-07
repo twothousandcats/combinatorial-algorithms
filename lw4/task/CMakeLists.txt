@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.20)
 project(task)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -13,7 +13,12 @@ else ()
 endif ()
 
 # logic
-add_library(task_logic STATIC src/BoruvkaTree.cpp)
+add_library(task_logic STATIC
+        src/BoruvkaTree.cpp
+        src/SteinerTree.cpp
+        src/Point.cpp
+        src/Repository.cpp
+)
 target_include_directories(task_logic
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include

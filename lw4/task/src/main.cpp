@@ -3,8 +3,12 @@
 #include "SteinerTree.h"
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <memory>
 
-ReadFromFile(const std::string& filePath)
+std::vector<Terminal> ReadFromFile(const std::string& filePath)
 {
 	std::ifstream file(filePath);
 	if (!file.is_open())
@@ -26,7 +30,6 @@ ReadFromFile(const std::string& filePath)
 
 		if (!(iss >> name >> xInt >> yInt))
 		{
-			// Skip malformed lines or throw depending on requirements
 			continue;
 		}
 
@@ -41,7 +44,6 @@ ReadFromFile(const std::string& filePath)
 
 int main(int argc, char* argv[])
 {
-	// Default file or from argument
 	std::string filename = "input.txt";
 	if (argc > 1)
 	{
@@ -50,7 +52,6 @@ int main(int argc, char* argv[])
 
 	try
 	{
-		// 1. Read Data
 		const auto terminals = ReadFromFile(filename);
 
 		if (terminals.empty())
@@ -59,16 +60,13 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 
-		// 2. Setup Solver with Dependencies
-		auto solver = NetworkSolver(
-			std::make_unique<BoruvkaMst>(),
-			std::make_unique<SteinerHeuristic>()
+		Repository solver(
+			std::make_unique<BoruvkaTree>(),
+			std::make_unique<SteinerTree>()
 		);
 
-		// 3. Solve
 		const auto result = solver.Solve(terminals);
 
-		// 4. Output
 		std::cout << "Results:\n";
 		std::cout << "MST Length:      " << result.mstLength << "\n";
 		std::cout << "Steiner Length:  " << result.steinerLength << "\n";
