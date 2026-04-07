@@ -35,7 +35,6 @@ TreeResult BoruvkaTree::Build(const std::vector<Point>& points)
 
 	TreeResult result;
 	int components = n;
-
 	struct FullEdge
 	{
 		int u;
@@ -82,11 +81,11 @@ TreeResult BoruvkaTree::Build(const std::vector<Point>& points)
 		{
 			if (closestEdgeIdx[i] != -1)
 			{
-				const auto& e = allEdges[closestEdgeIdx[i]];
-				if (unite(e.u, e.v))
+				const auto& [u, v, w] = allEdges[closestEdgeIdx[i]];
+				if (unite(u, v))
 				{
-					result.edges.push_back({ e.u, e.v, e.w });
-					result.totalLength += e.w;
+					result.edges.push_back({ u, v, w });
+					result.totalLength += w;
 					--components;
 					merged = true;
 				}

@@ -16,4 +16,6 @@ namespace Geometry
 double Distance(const Point& a, const Point& b);
 
 Point GetCentroid(const Point& a, const Point& b, const Point& c);
+
+Point GetFermatPoint(const Point& a, const Point& b, const Point& c);
 }
