@@ -3,36 +3,25 @@
 #include <vector>
 #include <memory>
 
-struct Edge {
+struct Edge
+{
 	int u{};
 	int v{};
 	double weight{};
 
 	Edge() = default;
-	Edge(int u, int v, double w) : u(u), v(v), weight(w) {}
+
+	Edge(int u, int v, double w);
 };
 
-struct Graph {
+struct Graph
+{
 	std::vector<geometry::Point> nodes;
 	std::vector<Edge> edges;
 
-	void AddNode(const geometry::Point& p) {
-		nodes.push_back(p);
-	}
+	void AddNode(const geometry::Point& p);
 
-	void AddEdge(int u, int v) {
-		if (u < 0 || v < 0 || u >= static_cast<int>(nodes.size()) || v >= static_cast<int>(nodes.size())) {
-			return;
-		}
-		double w = geometry::Distance(nodes[u], nodes[v]);
-		edges.emplace_back(u, v, w);
-	}
+	void AddEdge(int u, int v);
 
-	double TotalWeight() const {
-		double sum = 0.0;
-		for (const auto& e : edges) {
-			sum += e.weight;
-		}
-		return sum;
-	}
+	double TotalWeight() const;
 };
