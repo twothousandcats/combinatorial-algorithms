@@ -73,17 +73,8 @@ SteinerTreeSolver::Result SteinerTreeSolver::Compute(const Graph& terminals)
 
 		if (maxReduction > 1e-6)
 		{
-			// Add Steiner point
-			int newNodeIdx = static_cast<int>(res.graph.nodes.size());
+			// Add Steiner point to the list of nodes
 			res.graph.nodes.push_back(bestCandidate);
-
-			// Connect to neighbors
-			for (int nb : bestNeighbors)
-			{
-				res.graph.AddEdge(newNodeIdx, nb);
-			}
-
-			// Recompute MST on all current nodes
 			Graph tempGraph;
 			tempGraph.nodes = res.graph.nodes;
 			Graph newMst = MstBoruvka::Compute(tempGraph);
