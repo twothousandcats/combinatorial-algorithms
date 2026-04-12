@@ -4,9 +4,11 @@ void Visualizer::SaveToHtml(const Graph& mst, const Graph& steiner, const std::s
 {
 	std::ofstream out(filename);
 	if (!out.is_open())
+	{
 		return;
+	}
 
-	// Determine bounds
+	// Determine bounds with epsilon
 	double minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
 	auto updateBounds = [&](const Graph& g) {
 		for (const auto& p : g.nodes)

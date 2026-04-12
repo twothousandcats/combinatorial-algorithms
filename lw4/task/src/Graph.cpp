@@ -1,12 +1,5 @@
 #include "Graph.h"
 
-namespace
-{
-
-constexpr double Epsilon = 1e-9;
-
-} // namespace
-
 Edge::Edge(int u, int v, double w)
 	: u(u), v(v), weight(w)
 {
@@ -35,4 +28,9 @@ double Graph::TotalWeight() const
 		sum += e.weight;
 	}
 	return sum;
+}
+
+std::size_t Graph::GetNodeCount() const
+{
+	return nodes.size();
 }

@@ -238,14 +238,14 @@ TEST_CASE("Steiner Tree result structure", "[steiner]")
 	REQUIRE(result.steinerPointsCount >= 0);
 }
 
-TEST_CASE("GetTorricelliPoint obtuse triangle returns vertex", "[geometry]")
+TEST_CASE("GetFermatPoint obtuse triangle returns vertex", "[geometry]")
 {
 	// Triangle with angle > 120 degrees at A
 	Point a(0.0, 0.0);
 	Point b(1.0, 0.1);
 	Point c(-1.0, 0.1);
 
-	Point result = GetTorricelliPoint(a, b, c);
+	Point result = GetFermatPoint(a, b, c);
 	// Should return vertex A since angle at A is obtuse (> 120)
 	REQUIRE(result == a);
 }

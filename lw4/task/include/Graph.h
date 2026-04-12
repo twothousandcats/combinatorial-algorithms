@@ -1,7 +1,6 @@
 #pragma once
 #include "Geometry.h"
 #include <vector>
-#include <memory>
 
 struct Edge
 {
@@ -24,4 +23,6 @@ struct Graph
 	void AddEdge(int u, int v);
 
 	double TotalWeight() const;
+
+	[[nodiscard]] std::size_t GetNodeCount() const;
 };

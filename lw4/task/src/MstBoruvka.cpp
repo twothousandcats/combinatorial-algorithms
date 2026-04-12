@@ -2,9 +2,11 @@
 
 Graph MstBoruvka::Compute(const Graph& inputGraph)
 {
-	int n = static_cast<int>(inputGraph.nodes.size());
+	const int n = static_cast<int>(inputGraph.nodes.size());
 	if (n == 0)
+	{
 		return {};
+	}
 
 	Graph mst;
 	mst.nodes = inputGraph.nodes;
@@ -12,7 +14,6 @@ Graph MstBoruvka::Compute(const Graph& inputGraph)
 	// Initialize components
 	std::vector<int> parent(n);
 	std::iota(parent.begin(), parent.end(), 0);
-
 	auto find = [&](int i) {
 		while (parent[i] != i)
 		{
@@ -22,9 +23,9 @@ Graph MstBoruvka::Compute(const Graph& inputGraph)
 		return i;
 	};
 
-	auto unite = [&](int i, int j) {
-		int rootI = find(i);
-		int rootJ = find(j);
+	auto unite = [&](const int i, const int j) {
+		const int rootI = find(i);
+		const int rootJ = find(j);
 		if (rootI != rootJ)
 		{
 			parent[rootI] = rootJ;
@@ -57,7 +58,9 @@ Graph MstBoruvka::Compute(const Graph& inputGraph)
 			int setV = find(e.v);
 
 			if (setU == setV)
+			{
 				continue;
+			}
 
 			if (closestEdgeIdx[setU] == -1 ||
 				allEdges[closestEdgeIdx[setU]].weight > e.weight)

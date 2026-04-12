@@ -15,9 +15,9 @@ public:
 	};
 
 	// Simple iterative improvement:
-	// 1. Start with MST.
-	// 2. Randomly sample potential Steiner points (or use centroids of triangles).
-	// 3. If adding a point and reconnecting its 3 nearest neighbors reduces total length, keep it.
-	// 4. Repeat.
+	// Start with MST.
+	// Randomly sample potential Steiner points (or use centroids of triangles).
+	// If adding a point and reconnecting its 3 nearest neighbors reduces total length, keep it.
+	// Repeat.
 	static Result Compute(const Graph& terminals);
 };

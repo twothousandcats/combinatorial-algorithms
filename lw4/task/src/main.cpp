@@ -21,15 +21,14 @@ bool LoadTerminalsFromFile(const std::string& filename, Graph& terminals)
 	std::string line;
 	while (std::getline(file, line))
 	{
-		// Пропускаем пустые строки
 		if (line.empty())
+		{
 			continue;
+		}
 
 		std::istringstream iss(line);
 		std::string label;
 		double x, y;
-
-		// Ожидаемый формат: Label X Y
 		if (iss >> label >> x >> y)
 		{
 			terminals.AddNode(geometry::Point(x, y));
@@ -44,20 +43,23 @@ bool LoadTerminalsFromFile(const std::string& filename, Graph& terminals)
 	return true;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	Graph terminals;
 
-	// 1. Load Terminals from File
-	// Замените "points.txt" на имя вашего файла
-	if (!LoadTerminalsFromFile("points.txt", terminals))
+	// Load Terminals from file
+	std::string inputFilename = "input.txt";
+	if (argc > 1)
 	{
-		return 1; // Exit if file loading failed
+		inputFilename = argv[1];
 	}
 
-	int N = terminals.GetNodeCount(); // Предполагаем, что есть метод получения количества узлов
-	// Если метода GetNodeCount нет, можно использовать локальный счетчик в LoadTerminalsFromFile
+	if (!LoadTerminalsFromFile(inputFilename, terminals))
+	{
+		return 1;
+	}
 
+	const std::size_t N = terminals.GetNodeCount();
 	if (N < 2)
 	{
 		std::cerr << "Error: Need at least 2 points to compute MST/Steiner tree." << std::endl;
@@ -66,15 +68,15 @@ int main()
 
 	std::cout << "Loaded " << N << " terminals from file." << std::endl;
 
-	// 2. Compute MST (Boruvka)
+	// Compute MST
 	Graph mst = MstBoruvka::Compute(terminals);
 	double mstLen = mst.TotalWeight();
 
-	// 3. Compute Steiner Tree (Heuristic)
+	//Compute Steiner Tree
 	auto steinerRes = SteinerTreeSolver::Compute(terminals);
 	double steinerLen = steinerRes.length;
 
-	// 4. Output Results
+	// Output Results
 	std::cout << "MST Length (Boruvka): " << mstLen << std::endl;
 	std::cout << "Steiner Length (Heuristic): " << steinerLen << std::endl;
 
@@ -89,7 +91,7 @@ int main()
 
 	std::cout << "Steiner Points Added: " << steinerRes.steinerPointsCount << std::endl;
 
-	// 5. Visualize
+	// Visualize
 	Visualizer::SaveToHtml(mst, steinerRes.graph, "output.html");
 	std::cout << "Visualization saved to output.html" << std::endl;
 

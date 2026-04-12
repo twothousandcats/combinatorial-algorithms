@@ -31,7 +31,7 @@ SteinerTreeSolver::Result SteinerTreeSolver::Compute(const Graph& terminals)
 			while (k == i || k == j)
 				k = rng() % n;
 
-			geometry::Point candidate = geometry::GetTorricelliPoint(
+			geometry::Point candidate = geometry::GetFermatPoint(
 				res.graph.nodes[i], res.graph.nodes[j], res.graph.nodes[k]);
 
 			// Find 3 closest nodes in current graph to candidate

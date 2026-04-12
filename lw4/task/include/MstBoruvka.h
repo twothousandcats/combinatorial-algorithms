@@ -1,8 +1,5 @@
 #pragma once
 #include "Graph.h"
-#include <vector>
-#include <numeric>
-#include <algorithm>
 
 class MstBoruvka
 {

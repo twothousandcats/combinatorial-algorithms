@@ -25,8 +25,7 @@ struct Point
 
 double Distance(const Point& a, const Point& b);
 
-// Torricelli point (Fermat point) for a triangle if all angles < 120 degrees
-// Otherwise returns the vertex with the obtuse angle
-Point GetTorricelliPoint(const Point& a, const Point& b, const Point& c);
+// Fermat point
+Point GetFermatPoint(const Point& a, const Point& b, const Point& c);
 
 } // namespace geometry
