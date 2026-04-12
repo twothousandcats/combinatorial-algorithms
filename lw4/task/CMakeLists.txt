@@ -18,8 +18,10 @@ add_library(task_logic STATIC
         src/SteinerTree.cpp
         src/Point.cpp
         src/Repository.cpp
+        src/TreeVisualizer.cpp
 )
-target_include_directories(task_logic
+target_include_directories(
+        task_logic
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

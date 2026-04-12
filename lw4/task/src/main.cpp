@@ -1,82 +1,43 @@
-#include "Repository.h"
-#include "BoruvkaTree.h"
-#include "SteinerTree.h"
 #include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
 #include <vector>
-#include <memory>
+#include <random>
+#include "Geometry.h"
+#include "Graph.h"
+#include "MstBoruvka.h"
+#include "SteinerTree.h"
+#include "Visualizer.h"
 
-std::vector<Terminal> ReadFromFile(const std::string& filePath)
+int main()
 {
-	std::ifstream file(filePath);
-	if (!file.is_open())
+	// 1. Generate Random Terminals
+	const int N = 10;
+	std::mt19937 rng(12345);
+	std::uniform_real_distribution<double> dist(0.0, 100.0);
+
+	Graph terminals;
+	for (int i = 0; i < N; ++i)
 	{
-		throw std::runtime_error("Could not open file: " + filePath);
+		terminals.AddNode(geometry::Point(dist(rng), dist(rng)));
 	}
 
-	std::vector<Terminal> terminals;
-	std::string line;
+	// 2. Compute MST (Boruvka)
+	Graph mst = MstBoruvka::Compute(terminals);
+	double mstLen = mst.TotalWeight();
 
-	while (std::getline(file, line))
-	{
-		if (line.empty()) continue;
+	// 3. Compute Steiner Tree (Heuristic)
+	auto steinerRes = SteinerTreeSolver::Compute(terminals);
+	double steinerLen = steinerRes.length;
 
-		std::istringstream iss(line);
-		std::string name;
-		int xInt{};
-		int yInt{};
+	// 4. Output Results
+	std::cout << "Terminals: " << N << std::endl;
+	std::cout << "MST Length (Boruvka): " << mstLen << std::endl;
+	std::cout << "Steiner Length (Heuristic): " << steinerLen << std::endl;
+	std::cout << "Improvement: " << ((mstLen - steinerLen) / mstLen * 100.0) << "%" << std::endl;
+	std::cout << "Steiner Points Added: " << steinerRes.steinerPointsCount << std::endl;
 
-		if (!(iss >> name >> xInt >> yInt))
-		{
-			continue;
-		}
-
-		terminals.push_back({
-			name,
-			Point(static_cast<double>(xInt), static_cast<double>(yInt))
-		});
-	}
-
-	return terminals;
-}
-
-int main(int argc, char* argv[])
-{
-	std::string filename = "input.txt";
-	if (argc > 1)
-	{
-		filename = argv[1];
-	}
-
-	try
-	{
-		const auto terminals = ReadFromFile(filename);
-
-		if (terminals.empty())
-		{
-			std::cerr << "No terminals found in file.\n";
-			return 1;
-		}
-
-		Repository solver(
-			std::make_unique<BoruvkaTree>(),
-			std::make_unique<SteinerTree>()
-		);
-
-		const auto result = solver.Solve(terminals);
-
-		std::cout << "Results:\n";
-		std::cout << "MST Length:      " << result.mstLength << "\n";
-		std::cout << "Steiner Length:  " << result.steinerLength << "\n";
-		std::cout << "Ratio (MST/SMT): " << result.ratio << "\n";
-	}
-	catch (const std::exception& ex)
-	{
-		std::cerr << "Error: " << ex.what() << "\n";
-		return 1;
-	}
+	// 5. Visualize
+	Visualizer::SaveToHtml(mst, steinerRes.graph, "output.html");
+	std::cout << "Visualization saved to output.html" << std::endl;
 
 	return 0;
 }
