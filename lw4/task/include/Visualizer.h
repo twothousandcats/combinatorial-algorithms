@@ -12,7 +12,9 @@ public:
 	{
 		std::ofstream out(filename);
 		if (!out.is_open())
+		{
 			return;
+		}
 
 		// Determine bounds
 		double minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
