@@ -6,19 +6,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # warnings
-if (MSVC)
-    add_compile_options(/W4 /WX-)
-else ()
-    add_compile_options(-Wall -Wextra -pedantic -Werror=return-type)
-endif ()
+#if (MSVC)
+#    add_compile_options(/W4 /WX-)
+#else ()
+#    add_compile_options(-Wall -Wextra -pedantic -Werror=return-type)
+#endif ()
 
 # logic
 add_library(task_logic STATIC
-        src/BoruvkaTree.cpp
+        src/Geometry.cpp
+        src/Graph.cpp
+        src/MstBoruvka.cpp
         src/SteinerTree.cpp
-        src/Point.cpp
-        src/Repository.cpp
-        src/TreeVisualizer.cpp
+        src/Visualizer.cpp
 )
 target_include_directories(
         task_logic
