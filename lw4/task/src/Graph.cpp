@@ -1,10 +1,5 @@
 #include "Graph.h"
 
-Edge::Edge(int u, int v, double w)
-	: u(u), v(v), weight(w)
-{
-}
-
 void Graph::AddNode(const geometry::Point& p)
 {
 	nodes.push_back(p);

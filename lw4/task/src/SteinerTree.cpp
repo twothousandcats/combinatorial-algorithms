@@ -2,10 +2,13 @@
 #include <algorithm>
 #include <limits>
 
+constexpr int MAX_ITERATIONS = 50;
+constexpr int ITEMS_PER_ITERATION = 30;
+
 std::vector<int> SteinerTreeSolver::FindKNearestNeighbors(
 	const std::vector<geometry::Point>& nodes,
 	const geometry::Point& point,
-	int k)
+	const int k)
 {
 	std::vector<std::pair<double, int> > dists;
 	dists.reserve(nodes.size());
@@ -16,8 +19,7 @@ std::vector<int> SteinerTreeSolver::FindKNearestNeighbors(
 		dists.emplace_back(d, static_cast<int>(idx));
 	}
 
-	std::sort(dists.begin(), dists.end());
-
+	std::ranges::sort(dists);
 	std::vector<int> result;
 	result.reserve(k);
 	for (int i = 0; i < std::min(k, static_cast<int>(dists.size())); ++i)
@@ -30,7 +32,7 @@ std::vector<int> SteinerTreeSolver::FindKNearestNeighbors(
 
 std::vector<std::tuple<int, int, int> > SteinerTreeSolver::GenerateCloseTriplets(
 	const std::vector<geometry::Point>& nodes,
-	int maxTriplets)
+	int maxTriplets = 15)
 {
 	std::vector<std::tuple<int, int, int> > triplets;
 
@@ -103,23 +105,18 @@ SteinerTreeSolver::Result SteinerTreeSolver::Compute(const Graph& terminals)
 	res.length = res.graph.TotalWeight();
 	res.steinerPointsCount = 0;
 
-	const int maxIterations = 50;
-	const int candidatesPerIter = 30;
-
 	std::mt19937 rng(42);
-
-	for (int iter = 0; iter < maxIterations; ++iter)
+	for (int iter = 0; iter < MAX_ITERATIONS; ++iter)
 	{
 		bool improved = false;
 		geometry::Point bestCandidate;
-		std::vector<int> bestNeighbors;
 		double maxReduction = 0.0;
 
-		// Strategy 1: Generate triplets based on point proximity
-		auto closeTriplets = GenerateCloseTriplets(res.graph.nodes, candidatesPerIter / 2);
+		// Generate triplets based on point proximity
+		auto closeTriplets = GenerateCloseTriplets(res.graph.nodes, ITEMS_PER_ITERATION / 2);
 
-		// Strategy 2: Generate triplets based on MST structure
-		auto mstTriplets = GenerateMstEdgeTriplets(res.graph, candidatesPerIter / 2);
+		// Generate triplets based on MST structure
+		auto mstTriplets = GenerateMstEdgeTriplets(res.graph, ITEMS_PER_ITERATION / 2);
 
 		// Combine candidates
 		std::vector<std::tuple<int, int, int> > allTriplets;
@@ -127,24 +124,31 @@ SteinerTreeSolver::Result SteinerTreeSolver::Compute(const Graph& terminals)
 		allTriplets.insert(allTriplets.end(), mstTriplets.begin(), mstTriplets.end());
 
 		// Add random triplets for diversity
-		int randomTripletsCount = candidatesPerIter / 4;
+		const int randomTripletsCount = ITEMS_PER_ITERATION / 4;
 		for (int c = 0; c < randomTripletsCount; ++c)
 		{
 			int n = static_cast<int>(res.graph.nodes.size());
 			if (n < 3)
+			{
 				break;
+			}
 
 			int i = rng() % n;
 			int j = rng() % n;
 			int k = rng() % n;
 			while (j == i)
+			{
 				j = rng() % n;
+			}
 			while (k == i || k == j)
+			{
 				k = rng() % n;
+			}
 
 			allTriplets.emplace_back(i, j, k);
 		}
 
+		// todo: base
 		// Evaluate each candidate
 		for (const auto& [i, j, k] : allTriplets)
 		{
@@ -156,7 +160,7 @@ SteinerTreeSolver::Result SteinerTreeSolver::Compute(const Graph& terminals)
 
 			// Calculate new connection cost
 			double newCost = 0.0;
-			for (int nb : neighbors)
+			for (const int nb : neighbors)
 			{
 				newCost += geometry::Distance(candidate, res.graph.nodes[nb]);
 			}
@@ -166,16 +170,13 @@ SteinerTreeSolver::Result SteinerTreeSolver::Compute(const Graph& terminals)
 				geometry::Distance(res.graph.nodes[i], res.graph.nodes[j]),
 				geometry::Distance(res.graph.nodes[j], res.graph.nodes[k]),
 				geometry::Distance(res.graph.nodes[k], res.graph.nodes[i]) };
-			std::sort(sides.begin(), sides.end());
-			double triMst = sides[0] + sides[1];
+			std::ranges::sort(sides);
+			const double triMst = sides[0] + sides[1];
 
-			double reduction = triMst - newCost;
-
-			if (reduction > maxReduction)
+			if (const double reduction = triMst - newCost; reduction > maxReduction)
 			{
 				maxReduction = reduction;
 				bestCandidate = candidate;
-				bestNeighbors = neighbors;
 			}
 		}
 
@@ -186,7 +187,6 @@ SteinerTreeSolver::Result SteinerTreeSolver::Compute(const Graph& terminals)
 			Graph tempGraph;
 			tempGraph.nodes = res.graph.nodes;
 			Graph newMst = MstBoruvka::Compute(tempGraph);
-
 			if (newMst.TotalWeight() < res.length - 1e-6)
 			{
 				res.graph = newMst;
@@ -202,7 +202,9 @@ SteinerTreeSolver::Result SteinerTreeSolver::Compute(const Graph& terminals)
 		}
 
 		if (!improved)
+		{
 			break;
+		}
 	}
 
 	return res;

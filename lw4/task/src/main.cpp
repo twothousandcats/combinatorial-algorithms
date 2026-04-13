@@ -28,8 +28,7 @@ bool LoadTerminalsFromFile(const std::string& filename, Graph& terminals)
 
 		std::istringstream iss(line);
 		std::string label;
-		double x, y;
-		if (iss >> label >> x >> y)
+		if (double x, y; iss >> label >> x >> y)
 		{
 			terminals.AddNode(geometry::Point(x, y));
 		}
@@ -69,12 +68,12 @@ int main(int argc, char* argv[])
 	std::cout << "Loaded " << N << " terminals from file." << std::endl;
 
 	// Compute MST
-	Graph mst = MstBoruvka::Compute(terminals);
-	double mstLen = mst.TotalWeight();
+	const Graph mst = MstBoruvka::Compute(terminals);
+	const double mstLen = mst.TotalWeight();
 
-	//Compute Steiner Tree
-	auto steinerRes = SteinerTreeSolver::Compute(terminals);
-	double steinerLen = steinerRes.length;
+	// Compute Steiner Tree
+	const auto steinerRes = SteinerTreeSolver::Compute(terminals);
+	const double steinerLen = steinerRes.length;
 
 	// Output Results
 	std::cout << "MST Length (Boruvka): " << mstLen << std::endl;

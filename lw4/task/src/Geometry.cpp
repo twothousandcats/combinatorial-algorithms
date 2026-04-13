@@ -3,6 +3,11 @@
 namespace geometry
 {
 
+Point::Point(const double x, const double y)
+	: x(x), y(y)
+{
+}
+
 bool Point::operator==(const Point& other) const
 {
 	return std::abs(x - other.x) < 1e-9 && std::abs(y - other.y) < 1e-9;
@@ -36,7 +41,7 @@ Point GetFermatPoint(const Point& a, const Point& b, const Point& c)
 		return c;
 	}
 
-	// Exact calculation for Fermat point using rotation method
+	// calc Fermat point using rotation method
 	auto rotate = [](const Point& p, const Point& center, const double angle) {
 		const double s = std::sin(angle);
 		const double c = std::cos(angle);

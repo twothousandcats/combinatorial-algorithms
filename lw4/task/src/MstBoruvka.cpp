@@ -40,8 +40,8 @@ Graph MstBoruvka::Compute(const Graph& inputGraph)
 	{
 		for (int j = i + 1; j < n; ++j)
 		{
-			double w = geometry::Distance(inputGraph.nodes[i], inputGraph.nodes[j]);
-			allEdges.emplace_back(i, j, w);
+			double weight = geometry::Distance(inputGraph.nodes[i], inputGraph.nodes[j]);
+			allEdges.emplace_back(i, j, weight);
 		}
 	}
 
@@ -50,13 +50,11 @@ Graph MstBoruvka::Compute(const Graph& inputGraph)
 	{
 		// For each component, find the cheapest edge connecting it to another
 		std::vector<int> closestEdgeIdx(n, -1);
-
 		for (size_t k = 0; k < allEdges.size(); ++k)
 		{
 			const auto& e = allEdges[k];
-			int setU = find(e.u);
-			int setV = find(e.v);
-
+			const int setU = find(e.u);
+			const int setV = find(e.v);
 			if (setU == setV)
 			{
 				continue;

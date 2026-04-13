@@ -14,6 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # logic
 add_library(task_logic STATIC
+        src/Edge.cpp
         src/Geometry.cpp
         src/Graph.cpp
         src/MstBoruvka.cpp
