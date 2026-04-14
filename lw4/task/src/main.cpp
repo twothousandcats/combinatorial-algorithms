@@ -67,14 +67,11 @@ int main(int argc, char* argv[])
 
 	std::cout << "Loaded " << N << " terminals from file." << std::endl;
 
-	// Compute MST
+	// Boruvka　mst
 	const Graph mst = MstBoruvka::Compute(terminals);
 	const double mstLen = mst.TotalWeight();
-
-	// Compute Steiner Tree
-	const auto steinerRes = SteinerTreeSolver::Compute(terminals);
-	const double steinerLen = steinerRes.length;
-
+	// Steiner mst
+	const auto [graph, steinerLen, steinerPointsCount] = SteinerTreeSolver::Compute(terminals);
 	// Output Results
 	std::cout << "MST Length (Boruvka): " << mstLen << std::endl;
 	std::cout << "Steiner Length (Heuristic): " << steinerLen << std::endl;
@@ -88,10 +85,10 @@ int main(int argc, char* argv[])
 		std::cout << "Improvement: N/A (MST length is 0)" << std::endl;
 	}
 
-	std::cout << "Steiner Points Added: " << steinerRes.steinerPointsCount << std::endl;
+	std::cout << "Steiner Points Added: " << steinerPointsCount << std::endl;
 
 	// Visualize
-	Visualizer::SaveToHtml(mst, steinerRes.graph, "output.html");
+	Visualizer::SaveToHtml(mst, graph, "output.html");
 	std::cout << "Visualization saved to output.html" << std::endl;
 
 	return 0;

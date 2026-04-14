@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <limits>
 
-constexpr int MAX_ITERATIONS = 50;
+constexpr int MAX_ITERATIONS = 1000;
 constexpr int ITEMS_PER_ITERATION = 30;
 
 std::vector<int> SteinerTreeSolver::FindKNearestNeighbors(
@@ -114,7 +114,6 @@ SteinerTreeSolver::Result SteinerTreeSolver::Compute(const Graph& terminals)
 
 		// Generate triplets based on point proximity
 		auto closeTriplets = GenerateCloseTriplets(res.graph.nodes, ITEMS_PER_ITERATION / 2);
-
 		// Generate triplets based on MST structure
 		auto mstTriplets = GenerateMstEdgeTriplets(res.graph, ITEMS_PER_ITERATION / 2);
 

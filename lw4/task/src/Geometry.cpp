@@ -27,7 +27,6 @@ Point GetFermatPoint(const Point& a, const Point& b, const Point& c)
 	const double ca2 = Distance(c, a) * Distance(c, a);
 
 	// Check if any angle >= 120 degrees using cosine rule
-	// If A >= 120, cos(A) <= -0.5 => a^2 >= b^2 + c^2 + bc
 	if (bc2 >= ab2 + ca2 + std::sqrt(ab2 * ca2))
 	{
 		return a;
@@ -56,11 +55,11 @@ Point GetFermatPoint(const Point& a, const Point& b, const Point& c)
 	// Rotate B by -60 degrees around A to get B'
 	// Rotate C by +60 degrees around A to get C'
 	// Intersection of lines BB' and CC' gives the Fermat point
-	Point bRot = rotate(b, a, -M_PI / 3.0);
-	Point cRot = rotate(c, a, M_PI / 3.0);
+	const Point bRot = rotate(b, a, -M_PI / 3.0);
+	const Point cRot = rotate(c, a, M_PI / 3.0);
 
-	// Line intersection: line through (b, bRot) and line through (c, cRot)
-	// Using parametric form: P = b + t*(bRot-b) = c + u*(cRot-c)
+	// intersection
+	// parametric form
 	double dx1 = bRot.x - b.x;
 	double dy1 = bRot.y - b.y;
 	double dx2 = cRot.x - c.x;
