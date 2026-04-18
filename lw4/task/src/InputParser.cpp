@@ -1,11 +1,12 @@
-#include "steiner_lab/input_parser.h"
-#include "steiner_lab/exceptions.h"
+#include "InputParser.h"
+#include "Exceptions.h"
 
+#include <cstddef>
 #include <istream>
 #include <sstream>
 #include <string>
 
-namespace steiner_lab
+namespace steiner
 {
 
 // Пытается разобрать одну строку как пару координат и нужна для валидации формата ввода.
@@ -23,7 +24,7 @@ bool TerminalSetParser::TryParseSingleLineAsTwoDoubles(const std::string& line, 
 	{
 		return false;
 	}
-	outPoint = {coordinateX, coordinateY};
+	outPoint = { coordinateX, coordinateY };
 	return true;
 }
 
@@ -50,4 +51,4 @@ std::vector<Point2D> TerminalSetParser::ParseLinesOfPairs(std::istream& input) c
 	return terminals;
 }
 
-} // namespace steiner_lab
+} // namespace steiner

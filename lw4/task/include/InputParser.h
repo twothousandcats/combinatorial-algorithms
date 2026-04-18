@@ -1,11 +1,12 @@
 #pragma once
 
-#include "steiner_lab/geometry.h"
+#include "Geometry.h"
+
 #include <istream>
 #include <string>
 #include <vector>
 
-namespace steiner_lab
+namespace steiner
 {
 
 class TerminalSetParser
@@ -17,4 +18,4 @@ private:
 	[[nodiscard]] static bool TryParseSingleLineAsTwoDoubles(const std::string& line, Point2D& outPoint);
 };
 
-} // namespace steiner_lab
+} // namespace steiner

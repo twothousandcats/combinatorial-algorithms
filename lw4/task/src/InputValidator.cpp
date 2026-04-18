@@ -1,9 +1,9 @@
-#include "steiner_lab/input_validator.h"
-#include "steiner_lab/exceptions.h"
+#include "InputValidator.h"
+#include "Exceptions.h"
 
 #include <cmath>
 
-namespace steiner_lab
+namespace steiner
 {
 
 // Проверяет конечность всех координат и нужна для отсечения NaN/inf до вычислений.
@@ -28,4 +28,4 @@ void TerminalSetValidator::ValidateAllCoordinatesFiniteOrThrow(const std::vector
 	}
 }
 
-} // namespace steiner_lab
+} // namespace steiner

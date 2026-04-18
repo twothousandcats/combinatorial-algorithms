@@ -1,11 +1,12 @@
 #pragma once
 
-#include "steiner_lab/geometry.h"
+#include "Geometry.h"
+
 #include <cstddef>
 #include <optional>
 #include <vector>
 
-namespace steiner_lab
+namespace steiner
 {
 
 struct UndirectedEdge
@@ -31,24 +32,31 @@ private:
 	{
 	public:
 		explicit DisjointSetUnion(std::size_t elementCount);
+
 		int Find(int elementIndex);
+
 		bool Unite(int firstIndex, int secondIndex);
 
 	private:
 		void AttachChildToParent(int childRoot, int parentRoot);
+
 		void BumpParentRankIfTied(int parentRoot, bool siblingRanksWereEqual);
 
 		std::vector<int> m_parent;
 		std::vector<int> m_rank;
 	};
 
-	[[nodiscard]] static double TerminalEdgeWeight(const std::vector<Point2D>& terminals, int firstIndex, int secondIndex);
-	static void ConsiderEdgeForComponentMinima(std::vector<std::optional<UndirectedEdge>>& bestForRoot, int rootFirst,
+	[[nodiscard]] static double TerminalEdgeWeight(const std::vector<Point2D>& terminals, int firstIndex,
+		int secondIndex);
+
+	static void ConsiderEdgeForComponentMinima(std::vector<std::optional<UndirectedEdge> >& bestForRoot, int rootFirst,
 		int rootSecond, const UndirectedEdge& edge);
-	[[nodiscard]] static std::vector<std::optional<UndirectedEdge>> CollectPhaseMinimumEdges(
+
+	[[nodiscard]] static std::vector<std::optional<UndirectedEdge> > CollectPhaseMinimumEdges(
 		const std::vector<Point2D>& terminals, int terminalCount, DisjointSetUnion& disjointSet);
+
 	[[nodiscard]] static int ApplyPhaseMerges(DisjointSetUnion& disjointSet, MstResult& result, int terminalCount,
-		const std::vector<std::optional<UndirectedEdge>>& bestForRoot);
+		const std::vector<std::optional<UndirectedEdge> >& bestForRoot);
 };
 
-} // namespace steiner_lab
+} // namespace steiner

@@ -1,9 +1,9 @@
-#include "steiner_lab/file_io.h"
-#include "steiner_lab/exceptions.h"
+#include "FileIo.h"
+#include "Exceptions.h"
 
 #include <fstream>
 
-namespace steiner_lab
+namespace steiner
 {
 
 // Записывает текст в файл и нужен для сохранения результатов/артефактов на диск.
@@ -21,4 +21,4 @@ void WriteTextFile(const std::string& path, const std::string& text)
 	}
 }
 
-} // namespace steiner_lab
+} // namespace steiner

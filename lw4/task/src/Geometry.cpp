@@ -1,14 +1,12 @@
-#include "steiner_lab/geometry.h"
-#include "steiner_lab/constants.h"
+#include "Geometry.h"
+#include "Constants.h"
 
 #include <algorithm>
 #include <array>
 #include <cmath>
 
-namespace steiner_lab
+namespace steiner
 {
-
-using namespace geometry_constants;
 
 // Возвращает евклидово расстояние и нужен как базовая метрика всех алгоритмов.
 double EuclideanGeometry::Distance(const Point2D& pointA, const Point2D& pointB)
@@ -44,16 +42,16 @@ double EuclideanGeometry::AngleAtB(const Point2D& pointA, const Point2D& vertexB
 }
 
 // Строит третью вершину равностороннего треугольника и нужен как вспомогательная геометрия.
-Point2D EuclideanGeometry::EquilateralThirdPoint(const Point2D& pointA, const Point2D& pointB, bool rotateCounterClockwise)
+Point2D EuclideanGeometry::EquilateralThirdPoint(const Point2D& pointA, const Point2D& pointB,
+	bool rotateCounterClockwise)
 {
 	const double vectorX = pointB.x - pointA.x;
 	const double vectorY = pointB.y - pointA.y;
 	const double cosine = kOneHalf;
-	const double sine =
-		(rotateCounterClockwise ? kOne : kMinusOne) * (std::sqrt(kThree) * kOneHalf);
+	const double sine = (rotateCounterClockwise ? kOne : kMinusOne) * (std::sqrt(kThree) * kOneHalf);
 	const double rotatedX = cosine * vectorX - sine * vectorY;
 	const double rotatedY = sine * vectorX + cosine * vectorY;
-	return {pointA.x + rotatedX, pointA.y + rotatedY};
+	return { pointA.x + rotatedX, pointA.y + rotatedY };
 }
 
 // Возвращает порог 120 градусов в радианах и нужен для ветвления формулы Ферма-точки.
@@ -69,7 +67,7 @@ Point2D EuclideanGeometry::WeiszfeldIterationStep(const Point2D& current, const 
 	double weightSum = 0.0;
 	double numeratorX = 0.0;
 	double numeratorY = 0.0;
-	const std::array<Point2D, 3> corners = {pointA, pointB, pointC};
+	const std::array<Point2D, 3> corners = { pointA, pointB, pointC };
 	for (const Point2D& corner : corners)
 	{
 		const double distanceValue = std::max(kWeiszfeldDistanceFloor, Distance(current, corner));
@@ -78,14 +76,15 @@ Point2D EuclideanGeometry::WeiszfeldIterationStep(const Point2D& current, const 
 		numeratorX += weight * corner.x;
 		numeratorY += weight * corner.y;
 	}
-	return {numeratorX / weightSum, numeratorY / weightSum};
+	return { numeratorX / weightSum, numeratorY / weightSum };
 }
 
 // Ищет геометрическую медиану трех точек и нужен как численный подалгоритм Ферма-Торричелли.
-Point2D EuclideanGeometry::WeiszfeldGeometricMedianThree(const Point2D& pointA, const Point2D& pointB, const Point2D& pointC)
+Point2D EuclideanGeometry::WeiszfeldGeometricMedianThree(const Point2D& pointA, const Point2D& pointB,
+	const Point2D& pointC)
 {
-	Point2D current{(pointA.x + pointB.x + pointC.x) / kCentroidDivisor,
-		(pointA.y + pointB.y + pointC.y) / kCentroidDivisor};
+	Point2D current{ (pointA.x + pointB.x + pointC.x) / kCentroidDivisor,
+	                 (pointA.y + pointB.y + pointC.y) / kCentroidDivisor };
 	for (int iteration = 0; iteration < kWeiszfeldMaxIterations; ++iteration)
 	{
 		const Point2D next = WeiszfeldIterationStep(current, pointA, pointB, pointC);
@@ -117,4 +116,4 @@ Point2D EuclideanGeometry::FermatTorricelliPoint(const Point2D& pointA, const Po
 	return WeiszfeldGeometricMedianThree(pointA, pointB, pointC);
 }
 
-} // namespace steiner_lab
+} // namespace steiner
