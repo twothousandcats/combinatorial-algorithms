@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(task)
+project(task2)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,42 +13,44 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #endif ()
 
 # logic
-add_library(task_logic STATIC
-        src/Edge.cpp
+add_library(task2_logic STATIC
+        src/BoruvkaMST.cpp
+        src/DisjointSet.cpp
         src/Geometry.cpp
         src/Graph.cpp
-        src/MstBoruvka.cpp
+        src/InputReader.cpp
+        src/Point.cpp
         src/SteinerTree.cpp
         src/Visualizer.cpp
 )
 target_include_directories(
-        task_logic
+        task2_logic
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-add_executable(task src/main.cpp)
-target_link_libraries(task
+add_executable(task2 src/main.cpp)
+target_link_libraries(task2
         PRIVATE
-        task_logic
+        task2_logic
 )
 
 # Tests
 find_package(Catch2 REQUIRED)
 
-add_executable(task-tests tests/tests.cpp)
-target_link_libraries(task-tests
+add_executable(task2-tests tests/tests.cpp)
+target_link_libraries(task2-tests
         PRIVATE
-        task_logic
+        task2_logic
         Catch2::Catch2WithMain
 )
 
 include(CTest)
-add_test(NAME UnitTests COMMAND task-tests)
+add_test(NAME UnitTests COMMAND task2-tests)
 set_property(TEST UnitTests PROPERTY LABELS "Unit")
 
 # Auto-run tests after build
-add_custom_command(TARGET task-tests POST_BUILD
+add_custom_command(TARGET task2-tests POST_BUILD
         COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -R UnitTests
         COMMENT "Running unit tests..."
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

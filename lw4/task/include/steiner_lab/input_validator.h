@@ -1,0 +1,16 @@
+#pragma once
+
+#include "steiner_lab/geometry.h"
+#include <vector>
+
+namespace steiner_lab
+{
+
+class TerminalSetValidator
+{
+public:
+	[[nodiscard]] bool AreAllCoordinatesFinite(const std::vector<Point2D>& terminals) const noexcept;
+	void ValidateAllCoordinatesFiniteOrThrow(const std::vector<Point2D>& terminals) const;
+};
+
+} // namespace steiner_lab

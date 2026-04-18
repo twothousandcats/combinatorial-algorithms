@@ -1,95 +1,111 @@
+// CLI app: read user terminals and compare MST (Boruvka) with exact ESMT.
+#include "steiner_lab/boruvka.h"
+#include "steiner_lab/comparison_math.h"
+#include "steiner_lab/euclidean_steiner.h"
+#include "steiner_lab/exceptions.h"
+#include "steiner_lab/file_io.h"
+#include "steiner_lab/graphviz_export.h"
+#include "steiner_lab/input_parser.h"
+#include "steiner_lab/input_validator.h"
+
+#include <chrono>
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
 #include <string>
-#include "Geometry.h"
-#include "Graph.h"
-#include "MstBoruvka.h"
-#include "SteinerTree.h"
-#include "Visualizer.h"
+#include <vector>
 
-bool LoadTerminalsFromFile(const std::string& filename, Graph& terminals)
+namespace
 {
-	std::ifstream file(filename);
-	if (!file.is_open())
-	{
-		std::cerr << "Error: Could not open file " << filename << std::endl;
-		return false;
-	}
 
-	std::string line;
-	while (std::getline(file, line))
-	{
-		if (line.empty())
-		{
-			continue;
-		}
-
-		std::istringstream iss(line);
-		std::string label;
-		if (double x, y; iss >> label >> x >> y)
-		{
-			terminals.AddNode(geometry::Point(x, y));
-		}
-		else
-		{
-			std::cerr << "Warning: Skipping invalid line: " << line << std::endl;
-		}
-	}
-
-	file.close();
-	return true;
+// Читает точки из stdin и нужна для получения пользовательского набора терминалов.
+std::vector<steiner_lab::Point2D> ReadPointsFromStdin()
+{
+	std::cout << "Введите точки (по одной в строке: x y). Завершите ввод через Ctrl+D:\n";
+	return steiner_lab::TerminalSetParser{}.ParseLinesOfPairs(std::cin);
 }
 
-int main(int argc, char* argv[])
+// Печатает сравнительные метрики длин и нужна для интерпретации результата двух алгоритмов.
+void PrintComparison(double mstLength, double esmtLength)
 {
-	Graph terminals;
-
-	// Load Terminals from file
-	std::string inputFilename = "input.txt";
-	if (argc > 1)
+	const steiner_lab::AlgorithmLengthRatios ratios = steiner_lab::ComputeAlgorithmLengthRatios(mstLength, esmtLength);
+	std::cout << "\n--- Сравнение ---\n";
+	std::cout << "Минимальное остовное дерево по Борувке: " << mstLength << "\n";
+	std::cout << "Алгоритм Штейнера: " << esmtLength << "\n";
+	if (ratios.mst_over_esmt_valid)
 	{
-		inputFilename = argv[1];
-	}
-
-	if (!LoadTerminalsFromFile(inputFilename, terminals))
-	{
-		return 1;
-	}
-
-	const std::size_t N = terminals.GetNodeCount();
-	if (N < 2)
-	{
-		std::cerr << "Error: Need at least 2 points to compute MST/Steiner tree." << std::endl;
-		return 1;
-	}
-
-	std::cout << "Loaded " << N << " terminals from file." << std::endl;
-
-	// Boruvka　mst
-	const Graph mst = MstBoruvka::Compute(terminals);
-	const double mstLen = mst.TotalWeight();
-	// Steiner mst
-	const auto [graph, steinerLen, steinerPointsCount] = SteinerTreeSolver::Compute(terminals);
-	// Output Results
-	std::cout << "MST Length (Boruvka): " << mstLen << std::endl;
-	std::cout << "Steiner Length (Heuristic): " << steinerLen << std::endl;
-
-	if (mstLen > 0)
-	{
-		std::cout << "Improvement: " << ((mstLen - steinerLen) / mstLen * 100.0) << "%" << std::endl;
+		std::cout << "Отношение: остовное дерево по Борувке / алгоритм Штейнера: " << ratios.mst_over_esmt << "\n";
 	}
 	else
 	{
-		std::cout << "Improvement: N/A (MST length is 0)" << std::endl;
+		std::cout << "Отношение: остовное дерево по Борувке / алгоритм Штейнера: недоступно\n";
 	}
+	if (ratios.esmt_save_percent_valid)
+	{
+		std::cout << "Экономия длины алгоритма Штейнера относительно остовного дерева по Борувке: "
+				  << ratios.esmt_save_percent_vs_mst << " %\n";
+	}
+	else
+	{
+		std::cout << "Экономия длины алгоритма Штейнера относительно остовного дерева по Борувке: недоступно\n";
+	}
+}
 
-	std::cout << "Steiner Points Added: " << steinerPointsCount << std::endl;
+// Сохраняет DOT-файлы и нужна для визуализации решений в Graphviz.
+void SaveDotFiles(const std::vector<steiner_lab::Point2D>& terminals, const steiner_lab::MstResult& mst,
+	const steiner_lab::EuclideanSteinerTree& esmt)
+{
+	steiner_lab::GraphvizDotExporter exporter{};
+	steiner_lab::WriteTextFile("result_mst.dot", exporter.ExportMst(terminals, mst, "BoruvkaMst"));
+	steiner_lab::WriteTextFile("result_steiner.dot", exporter.ExportSteinerTree(terminals, esmt, "SteinerTree"));
+	std::cout << "DOT-файлы сохранены: result_mst.dot, result_steiner.dot\n";
+}
 
-	// Visualize
-	Visualizer::SaveToHtml(mst, graph, "output.html");
-	std::cout << "Visualization saved to output.html" << std::endl;
+// Печатает DOT-код в консоль и нужен для быстрого копирования в Graphviz Online.
+void PrintDotToConsole(const std::vector<steiner_lab::Point2D>& terminals, const steiner_lab::MstResult& mst,
+	const steiner_lab::EuclideanSteinerTree& esmt)
+{
+	steiner_lab::GraphvizDotExporter exporter{};
+	const std::string mstDot = exporter.ExportMst(terminals, mst, "BoruvkaMst");
+	const std::string steinerDot = exporter.ExportSteinerTree(terminals, esmt, "SteinerTree");
+	std::cout << "\n--- DOT: минимальное остовное дерево по Борувке ---\n";
+	std::cout << mstDot;
+	std::cout << "\n--- DOT: алгоритм Штейнера ---\n";
+	std::cout << steinerDot;
+}
 
+} // namespace
+
+// Запускает ввод, вычисления и вывод и нужна как точка входа консольного приложения.
+int main()
+{
+	try
+	{
+		const std::vector<steiner_lab::Point2D> terminals = ReadPointsFromStdin();
+		steiner_lab::TerminalSetValidator{}.ValidateAllCoordinatesFiniteOrThrow(terminals);
+
+		const auto mstStart = std::chrono::steady_clock::now();
+		const steiner_lab::MstResult mst = steiner_lab::BoruvkaMstSolver{}.Build(terminals);
+		const auto mstEnd = std::chrono::steady_clock::now();
+
+		const auto esmtStart = std::chrono::steady_clock::now();
+		const steiner_lab::EuclideanSteinerTree esmt = steiner_lab::EuclideanSteinerSolver{}.Solve(terminals);
+		const auto esmtEnd = std::chrono::steady_clock::now();
+
+		std::cout << "\nРезультаты:\n";
+		std::cout << "Минимальное остовное дерево по Борувке, длина: " << mst.total_length << "\n";
+		std::cout << "Время построения остовного дерева по Борувке: "
+				  << std::chrono::duration<double, std::milli>(mstEnd - mstStart).count() << " ms\n";
+		std::cout << "Алгоритм Штейнера, длина: " << esmt.total_length << "\n";
+		std::cout << "Время выполнения алгоритма Штейнера: "
+				  << std::chrono::duration<double, std::milli>(esmtEnd - esmtStart).count() << " ms\n";
+
+		PrintComparison(mst.total_length, esmt.total_length);
+		SaveDotFiles(terminals, mst, esmt);
+		PrintDotToConsole(terminals, mst, esmt);
+	}
+	catch (const steiner_lab::SteinerLabException& error)
+	{
+		std::cerr << "Ошибка: " << error.what() << '\n';
+		return 1;
+	}
 	return 0;
 }
