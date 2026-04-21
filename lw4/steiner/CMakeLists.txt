@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(task2)
+project(steiner)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #endif ()
 
 # logic
-add_library(task2_logic STATIC
+add_library(steiner_logic STATIC
         src/BoruvkaMST.cpp
         src/DisjointSet.cpp
         src/Geometry.cpp
@@ -24,33 +24,33 @@ add_library(task2_logic STATIC
         src/Visualizer.cpp
 )
 target_include_directories(
-        task2_logic
+        steiner_logic
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-add_executable(task2 src/main.cpp)
-target_link_libraries(task2
+add_executable(steiner src/main.cpp)
+target_link_libraries(steiner
         PRIVATE
-        task2_logic
+        steiner_logic
 )
 
 # Tests
 find_package(Catch2 REQUIRED)
 
-add_executable(task2-tests tests/tests.cpp)
-target_link_libraries(task2-tests
+add_executable(steiner-tests tests/tests.cpp)
+target_link_libraries(steiner-tests
         PRIVATE
-        task2_logic
+        steiner_logic
         Catch2::Catch2WithMain
 )
 
 include(CTest)
-add_test(NAME UnitTests COMMAND task2-tests)
+add_test(NAME UnitTests COMMAND steiner-tests)
 set_property(TEST UnitTests PROPERTY LABELS "Unit")
 
 # Auto-run tests after build
-add_custom_command(TARGET task2-tests POST_BUILD
+add_custom_command(TARGET steiner-tests POST_BUILD
         COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -R UnitTests
         COMMENT "Running unit tests..."
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

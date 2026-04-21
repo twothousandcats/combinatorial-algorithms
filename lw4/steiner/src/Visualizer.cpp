@@ -129,7 +129,7 @@ void Visualizer::SaveToHtml(
 	out << "<html><head><meta charset='utf-8'><title>Steiner vs MST</title></head><body>\n";
 
 	// MST picture.
-	out << "<h2>Minimum Spanning Tree (Boruvka)</h2>\n";
+	out << "<h2>MST</h2>\n";
 	out << "<p>Length: " << SumWeights(mstEdges) << "</p>\n";
 	out << "<svg width='" << kCanvasWidth << "' height='" << kCanvasHeight
 		<< "' style='border:1px solid black'>\n";
@@ -142,8 +142,8 @@ void Visualizer::SaveToHtml(
 	}
 	out << "</svg>\n";
 
-	// Steiner picture.
-	out << "<h2>Steiner Tree (Heuristic)</h2>\n";
+	// Steiner picture
+	out << "<h2>Steiner Tree</h2>\n";
 	out << "<p>Length: " << steinerResult.totalLength << "</p>\n";
 	out << "<svg width='" << kCanvasWidth << "' height='" << kCanvasHeight
 		<< "' style='border:1px solid black'>\n";

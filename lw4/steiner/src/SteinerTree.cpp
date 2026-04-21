@@ -44,16 +44,14 @@ void RecomputeEdgeWeights(const std::vector<Point>& vertices, std::vector<Edge>&
 }
 
 // Collects Fermat-point candidates. Two families are generated:
-//   1. "Local" triples (a, v, b) where both (a-v) and (v-b) are edges of the
-//      current tree. A cheap local gain estimate is attached, used only for
-//      ordering.
-//   2. "Global" triples - every unordered triple of current vertices. These
+//   "Local" triples (a, v, b) where both (a-v) and (v-b) are edges of the
+//      current tree. Used only for ordering.
+//   "Global" triples - every unordered triple of current vertices. These
 //      let the search jump out of local minima that local tree triples cannot
 //      reach (e.g. the S-S chain topology of a Steiner tree on a convex hull).
 // Callers are expected to test each candidate by inserting it and running a
 // full topology/position refinement.
-std::vector<Point> CollectFermatCandidates(
-	const std::vector<Point>& vertices, const std::vector<Edge>& treeEdges)
+std::vector<Point> CollectFermatCandidates(const std::vector<Point>& vertices, const std::vector<Edge>& treeEdges)
 {
 	const auto adjacency = BuildAdjacency(vertices.size(), treeEdges);
 	std::vector<Point> candidates;
@@ -98,13 +96,13 @@ std::vector<Point> CollectFermatCandidates(
 			}
 		}
 	}
-	std::sort(localTriples.begin(), localTriples.end(),
+	std::ranges::sort(localTriples,
 		[](const ScoredTriple& lhs, const ScoredTriple& rhs) {
 			return lhs.gain > rhs.gain;
 		});
-	for (const auto& t : localTriples)
+	for (const auto& [gain, fermat] : localTriples)
 	{
-		push(t.fermat);
+		push(fermat);
 	}
 
 	// Global triples - every unordered {a, b, c} of current vertices.
@@ -128,7 +126,7 @@ std::vector<Point> CollectFermatCandidates(
 // towards the weighted (1/distance) average of its current tree neighbors.
 // Edge weights are kept in sync. Returns the largest single-point shift.
 double WeiszfeldStep(std::vector<Point>& vertices, std::vector<Edge>& edges,
-	std::size_t terminalCount)
+	const std::size_t terminalCount)
 {
 	const auto adjacency = BuildAdjacency(vertices.size(), edges);
 	double maxShift = 0.0;
@@ -144,7 +142,7 @@ double WeiszfeldStep(std::vector<Point>& vertices, std::vector<Edge>& edges,
 		double sumW = 0.0;
 		bool collapsed = false;
 		Point collapseTarget{};
-		for (std::size_t n : neighbors)
+		for (const std::size_t n : neighbors)
 		{
 			const double d = Distance(vertices[s], vertices[n]);
 			if (d < kPositionEpsilon)
@@ -188,9 +186,11 @@ double WeiszfeldStep(std::vector<Point>& vertices, std::vector<Edge>& edges,
 	return maxShift;
 }
 
-// Iterates Weiszfeld until every Steiner point is stationary within epsilon.
-void OptimizeSteinerPositions(std::vector<Point>& vertices, std::vector<Edge>& edges,
-	std::size_t terminalCount)
+// Iterates Weiszfeld until every Steiner point is stationary within epsilon
+void OptimizeSteinerPositions(
+	std::vector<Point>& vertices,
+	std::vector<Edge>& edges,
+	const std::size_t terminalCount)
 {
 	for (int i = 0; i < kMaxWeiszfeldIterations; ++i)
 	{
@@ -208,7 +208,7 @@ void OptimizeSteinerPositions(std::vector<Point>& vertices, std::vector<Edge>& e
 double RefineTopologyAndPositions(std::vector<Point>& vertices, std::vector<Edge>& edges,
 	std::size_t terminalCount)
 {
-	const BoruvkaMST mstBuilder;
+	constexpr BoruvkaMST mstBuilder;
 	double previousLength = TotalWeight(edges);
 	for (int i = 0; i < kMaxRefineIterations; ++i)
 	{
@@ -236,8 +236,8 @@ void CleanupSteinerPoints(std::vector<Point>& vertices, std::vector<Edge>& edges
 	std::size_t terminalCount)
 {
 	auto removeEdgesTouching = [&edges](std::size_t v) {
-		edges.erase(std::remove_if(edges.begin(), edges.end(),
-			[v](const Edge& e) { return e.from == v || e.to == v; }), edges.end());
+		std::erase_if(edges,
+			[v](const Edge& e) { return e.from == v || e.to == v; });
 	};
 
 	bool changed = true;
@@ -261,8 +261,8 @@ void CleanupSteinerPoints(std::vector<Point>& vertices, std::vector<Edge>& edges
 							e.to = other;
 					}
 					// Drop self-loops and duplicates created by the merge.
-					edges.erase(std::remove_if(edges.begin(), edges.end(),
-						[](const Edge& e) { return e.from == e.to; }), edges.end());
+					std::erase_if(edges,
+						[](const Edge& e) { return e.from == e.to; });
 					changed = true;
 					break;
 				}
@@ -358,46 +358,43 @@ SteinerTreeResult SteinerTreeBuilder::Build(const std::vector<Point>& terminals)
 
 	const std::size_t terminalCount = terminals.size();
 
-	// Insert Fermat points greedily. Each round evaluates both:
-	//   * single-candidate insertions (local tree triples + every global
-	//     vertex triple), and
-	//   * batch insertions where a contiguous prefix of local triples,
-	//     ordered by gain, is added simultaneously.
-	// The batch path is what lets the search realise S-S chain topologies
-	// that are unreachable by any sequence of single insertions, because
-	// individual Steiner points in such a chain are useless without the
-	// others (their optimal positions depend on each other).
-	auto tryInsertBatch = [&](const std::vector<Point>& extraPoints,
-		std::vector<Point>& outVertices, std::vector<Edge>& outEdges,
+	// Insert Fermat points greedily
+	auto tryInsertBatch = [&](
+		const std::vector<Point>& extraPoints,
+		std::vector<Point>& outVertices,
+		std::vector<Edge>& outEdges,
 		double& outLength) -> bool {
 		std::vector<Point> trialVertices = result.vertices;
 		const std::size_t baseSize = trialVertices.size();
-		for (std::size_t k = 0; k < extraPoints.size(); ++k)
+		for (const auto& extraPoint : extraPoints)
 		{
 			bool dup = false;
 			for (const auto& existing : trialVertices)
 			{
-				if (Distance(existing, extraPoints[k]) < kMergeEpsilon)
+				if (Distance(existing, extraPoint) < kMergeEpsilon)
 				{
 					dup = true;
 					break;
 				}
 			}
 			if (dup)
+			{
 				continue;
+			}
 			Point sp{};
 			sp.name = "S" + std::to_string(trialVertices.size() - terminalCount + 1);
-			sp.x = extraPoints[k].x;
-			sp.y = extraPoints[k].y;
+			sp.x = extraPoint.x;
+			sp.y = extraPoint.y;
 			trialVertices.push_back(std::move(sp));
 		}
 		if (trialVertices.size() == baseSize)
+		{
 			return false;
+		}
 
-		Graph trialGraph = Graph::BuildComplete(trialVertices);
+		const Graph trialGraph = Graph::BuildComplete(trialVertices);
 		std::vector<Edge> trialEdges = mstBuilder.Build(trialGraph);
-		const double refinedLength = RefineTopologyAndPositions(
-			trialVertices, trialEdges, terminalCount);
+		const double refinedLength = RefineTopologyAndPositions(trialVertices, trialEdges, terminalCount);
 		if (refinedLength + kImprovementEpsilon < outLength)
 		{
 			outVertices = std::move(trialVertices);
@@ -408,32 +405,30 @@ SteinerTreeResult SteinerTreeBuilder::Build(const std::vector<Point>& terminals)
 		return false;
 	};
 
+	// greedy
 	for (int round = 0; round < kMaxInsertionRounds; ++round)
 	{
-		const std::vector<Point> candidates =
-			CollectFermatCandidates(result.vertices, result.edges);
-
+		// collect candidates
+		const std::vector<Point> candidates = CollectFermatCandidates(result.vertices, result.edges);
 		std::vector<Point> bestVertices;
 		std::vector<Edge> bestEdges;
 		double bestLength = result.totalLength;
 
-		// Single-candidate attempts.
+		// try to insert single-terminal
 		for (const auto& fermat : candidates)
 		{
 			tryInsertBatch({ fermat }, bestVertices, bestEdges, bestLength);
 		}
 
-		// Batch attempts - add the first k candidates (k = 2..maxBatch) at
-		// once. Candidates are ordered so the most promising (largest local
-		// gain) come first.
-		const std::size_t maxBatch = std::min<std::size_t>(
-			candidates.size(), terminalCount);
+		// try to insert k-terminals starts with k >= 2
+		const std::size_t maxBatch = std::min<std::size_t>(candidates.size(), terminalCount);
 		for (std::size_t k = 2; k <= maxBatch; ++k)
 		{
 			std::vector<Point> prefix(candidates.begin(), candidates.begin() + k);
 			tryInsertBatch(prefix, bestVertices, bestEdges, bestLength);
 		}
 
+		// found the best version of insertion
 		if (bestVertices.empty())
 		{
 			break;

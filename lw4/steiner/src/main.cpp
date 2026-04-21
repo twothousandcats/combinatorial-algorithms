@@ -54,8 +54,7 @@ int main(int argc, char* argv[])
 		std::cout << "MST edges:\n";
 		PrintEdges(terminals, mstEdges, std::cout);
 
-		const steiner::SteinerTreeBuilder steinerBuilder;
-		const auto steinerResult = steinerBuilder.Build(terminals);
+		const auto steinerResult = steiner::SteinerTreeBuilder::Build(terminals);
 		const std::size_t steinerPointCount =
 			steinerResult.vertices.size() - terminals.size();
 
