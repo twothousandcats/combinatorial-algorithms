@@ -1,9 +1,10 @@
-#include "ISolver.h"
+#include "CBruteForceSolver.h"
 
 #include <vector>
 
 namespace knapsack
 {
+
 bool NextPermutation(std::vector<int>& bits)
 {
 	for (auto it = bits.rbegin(); it != bits.rend(); ++it)
@@ -18,13 +19,14 @@ bool NextPermutation(std::vector<int>& bits)
 	return false;
 }
 
-KnapsackResult Solve(const std::vector<Item>& items, const int maxWeight)
+KnapsackResult CBruteForceSolver::Solve(const std::vector<Item>& items, int maxWeight) const
 {
 	const size_t n = items.size();
 	if (n == 0)
+	{
 		return { -1, {}, false };
+	}
 
-	// Use int vector for easier manipulation than size_t for bits
 	std::vector<int> current(n, 0);
 	KnapsackResult best{ -1, {}, false };
 
@@ -49,11 +51,14 @@ KnapsackResult Solve(const std::vector<Item>& items, const int maxWeight)
 			for (size_t i = 0; i < n; ++i)
 			{
 				if (current[i] == 1)
+				{
 					best.bestIndices.push_back(i);
+				}
 			}
 		}
 	} while (NextPermutation(current));
 
 	return best;
 }
-}
+
+} // namespace knapsack

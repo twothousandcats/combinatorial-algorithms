@@ -1,11 +1,13 @@
 #include "CGeneticSolver.h"
 
-#include "ISolver.h"
-
+#include <algorithm>
 #include <random>
+#include <stdexcept>
+#include <numeric>
 
 namespace knapsack
 {
+
 CGeneticSolver::CGeneticSolver(const int popSize, const int gens, const double mutRate)
 	: m_populationSize(popSize)
 	  , m_generations(gens)
@@ -13,54 +15,85 @@ CGeneticSolver::CGeneticSolver(const int popSize, const int gens, const double m
 	  , m_rng(std::random_device{}())
 {
 	if (popSize <= 0 || gens <= 0)
+	{
 		throw std::invalid_argument("Population size and generations must be positive");
+	}
 }
 
-KnapsackResult knapsack::CGeneticSolver::Solve(const std::vector<Item>& items, int maxWeight) const
+KnapsackResult CGeneticSolver::Solve(const std::vector<Item>& items, const int maxWeight) const
 {
-	const size_t n = items.size();
-	if (n == 0)
+	const size_t count = items.size();
+	if (count == 0)
+	{
 		return { -1, {}, false };
+	}
 
-	// Chromosome: vector<bool> or vector<int>. Using vector<int> for simplicity in crossover
 	using Chromosome = std::vector<int>;
 
-	auto fitness = [&](const Chromosome& chromo) -> int {
-		int w = 0, c = 0;
-		for (size_t i = 0; i < n; ++i)
+	auto evaluate = [&](const Chromosome& chromo) -> std::pair<int, int> {
+		// weight, cost
+		int weight = 0;
+		int cost = 0;
+		for (size_t i = 0; i < count; ++i)
 		{
 			if (chromo[i])
 			{
-				w += items[i].weight;
-				c += items[i].cost;
+				weight += items[i].weight;
+				cost += items[i].cost;
 			}
 		}
-		// Penalty for exceeding weight
-		if (w > maxWeight)
-			return -1;
-		return c;
+		return { weight, cost };
 	};
 
+	// If there is excess weight, then there is a fine
+	auto fitness = [&](const Chromosome& chromo) -> int {
+		auto [weight, cost] = evaluate(chromo);
+		if (weight > maxWeight)
+		{
+			return -1;
+		}
+		return cost;
+	};
+
+	// Generation of a valid chromosome
 	auto createRandomChromosome = [&]() -> Chromosome {
-		Chromosome chromo(n);
-		std::uniform_int_distribution<int> dist(0, 1);
-		for (auto& gene : chromo)
-			gene = dist(m_rng);
+		Chromosome chromo(count, 0);
+		std::vector<size_t> indices(count);
+		std::iota(indices.begin(), indices.end(), 0);
+		std::ranges::shuffle(indices, m_rng);
+
+		int currentWeight = 0;
+		for (const size_t idx : indices)
+		{
+			if (currentWeight + items[idx].weight <= maxWeight)
+			{
+				chromo[idx] = 1;
+				currentWeight += items[idx].weight;
+			}
+		}
 		return chromo;
 	};
 
-	// Initialize population
 	std::vector<Chromosome> population(m_populationSize);
 	for (auto& chromo : population)
+	{
+		// use improved initialization to guarantee at least one valid solution.
 		chromo = createRandomChromosome();
+	}
 
 	Chromosome bestChromo;
 	int bestFit = -1;
 
+	// distributions
+	std::uniform_real_distribution<double> probDist(0.0, 1.0);
+	std::uniform_int_distribution<size_t> crossDist(0, count - 1);
+
+	// Tournament selection
+	const size_t selectionPoolSize = std::max(static_cast<size_t>(2), static_cast<size_t>(m_populationSize / 2));
+
 	for (int gen = 0; gen < m_generations; ++gen)
 	{
-		// Evaluate
-		std::vector<std::pair<int, size_t> > scores; // fitness, index
+		std::vector<std::pair<int, size_t> > scores;
 		scores.reserve(m_populationSize);
 
 		int currentGenBestFit = -1;
@@ -83,41 +116,36 @@ KnapsackResult knapsack::CGeneticSolver::Solve(const std::vector<Item>& items, i
 			bestChromo = population[currentGenBestIdx];
 		}
 
-		// Selection (Tournament or Simple Top-K)
-		// Let's use simple elitism + random selection for diversity
-		std::sort(scores.begin(), scores.end(), [](const auto& a, const auto& b) {
+		std::ranges::sort(scores, [](const auto& a, const auto& b) {
 			return a.first > b.first;
 		});
 
 		std::vector<Chromosome> newPopulation;
-		// Elitism: keep top 10%
-		size_t eliteCount = std::max(size_t(1), m_populationSize / 10);
+		// Elitism
+		const size_t eliteCount = std::max(static_cast<size_t>(1), static_cast<size_t>(m_populationSize / 10));
 		for (size_t i = 0; i < eliteCount; ++i)
 		{
 			newPopulation.push_back(population[scores[i].second]);
 		}
 
-		// Crossover and Mutation
-		std::uniform_real_distribution<double> probDist(0.0, 1.0);
-		std::uniform_int_distribution<size_t> parentDist(0, eliteCount - 1); // Select from elite for stability
-		std::uniform_int_distribution<size_t> crossDist(0, n - 1);
-
 		while (newPopulation.size() < m_populationSize)
 		{
-			size_t p1Idx = parentDist(m_rng);
-			size_t p2Idx = parentDist(m_rng);
+			std::uniform_int_distribution<size_t> parentDist(0, selectionPoolSize - 1);
 
-			const Chromosome& p1 = population[scores[p1Idx].second];
-			const Chromosome& p2 = population[scores[p2Idx].second];
+			size_t p1Idx = scores[parentDist(m_rng)].second;
+			size_t p2Idx = scores[parentDist(m_rng)].second;
 
-			Chromosome child(n);
-			size_t crossPoint = crossDist(m_rng);
+			const Chromosome& p1 = population[p1Idx];
+			const Chromosome& p2 = population[p2Idx];
 
-			for (size_t i = 0; i < n; ++i)
+			Chromosome child(count);
+			const size_t crossPoint = crossDist(m_rng);
+			for (size_t i = 0; i < count; ++i)
 			{
 				child[i] = (i < crossPoint) ? p1[i] : p2[i];
-
-				// Mutation
+			}
+			for (size_t i = 0; i < count; ++i)
+			{
 				if (probDist(m_rng) < m_mutationRate)
 				{
 					child[i] = !child[i];
@@ -129,16 +157,17 @@ KnapsackResult knapsack::CGeneticSolver::Solve(const std::vector<Item>& items, i
 		population = std::move(newPopulation);
 	}
 
-	// Convert best chromosome to result
 	KnapsackResult res;
 	if (bestFit >= 0)
 	{
 		res.maxCost = bestFit;
 		res.found = true;
-		for (size_t i = 0; i < n; ++i)
+		for (size_t i = 0; i < count; ++i)
 		{
 			if (bestChromo[i])
+			{
 				res.bestIndices.push_back(i);
+			}
 		}
 	}
 	else
@@ -148,4 +177,5 @@ KnapsackResult knapsack::CGeneticSolver::Solve(const std::vector<Item>& items, i
 	}
 	return res;
 }
-}
+
+} // namespace knapsack

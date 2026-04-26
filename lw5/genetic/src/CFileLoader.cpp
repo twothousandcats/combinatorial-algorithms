@@ -1,5 +1,5 @@
 #include "CFileLoader.h"
-#include "ISolver.h"
+
 #include <fstream>
 
 namespace knapsack
@@ -7,7 +7,7 @@ namespace knapsack
 
 std::optional<CFileLoader::Header> CFileLoader::LoadHeader(std::istream& stream)
 {
-	Header h;
+	Header h{};
 	if (stream >> h.itemCount >> h.maxWeight)
 	{
 		return h;

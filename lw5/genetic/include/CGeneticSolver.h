@@ -5,6 +5,7 @@
 
 namespace knapsack
 {
+
 class CGeneticSolver : public ISolver
 {
 public:
@@ -16,6 +17,7 @@ private:
 	int m_populationSize;
 	int m_generations;
 	double m_mutationRate;
-	mutable std::mt19937 m_rng; //
+	mutable std::mt19937 m_rng;
 };
-}
+
+} // namespace knapsack
