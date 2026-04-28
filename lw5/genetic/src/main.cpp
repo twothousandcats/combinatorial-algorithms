@@ -7,9 +7,15 @@
 #include <chrono>
 #include <iomanip>
 #include <string>
+#include <vector>
 
 namespace
 {
+
+constexpr int POPULATION_COUNT = 200;
+constexpr int GENERATIONS_COUNT = 1000;
+constexpr double MUTATIONS_FACTOR = 0.01;
+constexpr int GREEDY_MAX_ITEMS = 12;
 
 void RunBenchmark(const std::string& name, const knapsack::ISolver& solver, const std::vector<knapsack::Item>& items, int maxWeight)
 {
@@ -19,7 +25,7 @@ void RunBenchmark(const std::string& name, const knapsack::ISolver& solver, cons
 
 	const std::chrono::duration<double, std::milli> elapsed = end - start;
 
-	std::cout << "--- " << name << " ---\n";
+	std::cout << "" << name << ":\n";
 	std::cout << "Time: " << std::fixed << std::setprecision(2) << elapsed.count() << " ms\n";
 	knapsack::PrintResult(std::cout, result);
 	std::cout << "\n";
@@ -58,21 +64,34 @@ int main(int argc, char* argv[])
 
 	const int maxWeight = headerOpt->maxWeight;
 
-	// Brute Force (only for small N <= 30 as per request)
-	if (items.size() <= 30)
+	// Greedy Algorithm with limit of 12 items
 	{
-		const auto bfSolver = knapsack::CreateBruteForceSolver();
-		RunBenchmark("Brute Force", *bfSolver, items, maxWeight);
-	}
-	else
-	{
-		std::cout << "Skipping Brute Force (N > 30).\n\n";
+		// Create a copy to avoid modifying the original 'items' vector used by Genetic Algorithm
+		std::vector<knapsack::Item> itemsForGreedy = items;
+
+		if (itemsForGreedy.size() > GREEDY_MAX_ITEMS)
+		{
+			itemsForGreedy.resize(GREEDY_MAX_ITEMS);
+		}
+
+		if (const auto greedySolver = knapsack::CreateBruteForceSolver())
+		{
+			RunBenchmark("Greedy Algorithm (Limited to 12)", *greedySolver, itemsForGreedy, maxWeight);
+		}
+		else
+		{
+			std::cerr << "Greedy solver not available.\n\n";
+		}
 	}
 
 	// Genetic Algorithm
-	// Tuned for larger inputs.
-	// For N=1000, we need decent population and generations.
-	const auto gaSolver = knapsack::CreateGeneticSolver(200, 1000, 0.05);
+	// Tuned for larger inputs
+	// For N=1000, we need decent population and generations
+	const auto gaSolver = knapsack::CreateGeneticSolver(
+		POPULATION_COUNT,
+		GENERATIONS_COUNT,
+		MUTATIONS_FACTOR
+		);
 	RunBenchmark("Genetic Algorithm", *gaSolver, items, maxWeight);
 
 	return 0;
