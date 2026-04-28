@@ -13,8 +13,9 @@ namespace
 {
 
 constexpr int POPULATION_COUNT = 200;
-constexpr int GENERATIONS_COUNT = 1000;
+constexpr int GENERATIONS_COUNT = 2000;
 constexpr double MUTATIONS_FACTOR = 0.01;
+
 constexpr int GREEDY_MAX_ITEMS = 12;
 
 void RunBenchmark(const std::string& name, const knapsack::ISolver& solver, const std::vector<knapsack::Item>& items, int maxWeight)

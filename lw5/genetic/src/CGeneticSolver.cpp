@@ -1,9 +1,11 @@
 #include "CGeneticSolver.h"
 
 #include <algorithm>
+#include <iostream>
 #include <random>
 #include <stdexcept>
 #include <numeric>
+#include <ostream>
 
 namespace knapsack
 {
@@ -155,6 +157,15 @@ KnapsackResult CGeneticSolver::Solve(const std::vector<Item>& items, const int m
 		}
 
 		population = std::move(newPopulation);
+
+		if (gen % 100 == 0)
+		{
+			std::cout
+				<< "current fit at "
+				<< std::to_string(gen) << " "
+				<< currentGenBestFit
+				<< std::endl;
+		}
 	}
 
 	KnapsackResult res;
