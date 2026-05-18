@@ -131,9 +131,13 @@ public class Program
     {
         console.WriteLine( $"Matching size: {result.Pairs.Count}" );
         console.WriteLine( $"is complete: {result.IsPerfect}" );
+        List<string> chain = new List<string>( result.Pairs.Count * 2 );
         foreach ( KeyValuePair<int, int> pair in result.Pairs.OrderBy( i => i.Key ) )
         {
-            console.WriteLine( $" {pair.Key} -> {pair.Value}" );
+            chain.Add( $"X{pair.Key}" );
+            chain.Add( $"Y{pair.Value}" );
         }
+
+        console.WriteLine( string.Join( " -> ", chain ) );
     }
 }
