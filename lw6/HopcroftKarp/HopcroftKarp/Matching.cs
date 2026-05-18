@@ -1,5 +1,6 @@
 namespace HopcroftKarp;
 
+// pair dictionary
 public sealed class Matching
 {
     public Matching( IReadOnlyDictionary<int, int> pairs, int leftSize )

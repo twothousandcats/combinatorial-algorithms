@@ -8,11 +8,11 @@ public class HopcroftKarpMatcher
 
     private readonly BipartiteGraph _bipartiteGraph;
 
-    private int[] _pairLeft = Array.Empty<int>();
+    private int[] _pairLeft = Array.Empty<int>(); // The relationship between the left "u" and the right vertex(idx)
 
-    private int[] _pairRight = Array.Empty<int>();
+    private int[] _pairRight = Array.Empty<int>(); // The relationship between the right "v" and the left vertex(idx)
 
-    private int[] _distance = Array.Empty<int>();
+    private int[] _distance = Array.Empty<int>(); // bfs
 
     public HopcroftKarpMatcher( BipartiteGraph bipartiteGraph )
     {
@@ -67,7 +67,7 @@ public class HopcroftKarpMatcher
             int u = queue.Dequeue();
             foreach ( int v in _bipartiteGraph.GetNeighbors( u ) )
             {
-                int pairU = _pairLeft[ v ];
+                int pairU = _pairRight[ v ];
                 if ( pairU == Nil )
                 {
                     found = true;
