@@ -1,0 +1,16 @@
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/HopcroftKarp.GeneratedMSBuildEditorConfig.editorconfig
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/HopcroftKarp.AssemblyInfoInputs.cache
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/HopcroftKarp.AssemblyInfo.cs
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/HopcroftKarp.csproj.CoreCompileInputs.cache
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/HopcroftKarp.sourcelink.json
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/bin/Debug/net10.0/HopcroftKarp
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/bin/Debug/net10.0/HopcroftKarp.deps.json
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/bin/Debug/net10.0/HopcroftKarp.runtimeconfig.json
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/bin/Debug/net10.0/HopcroftKarp.dll
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/bin/Debug/net10.0/HopcroftKarp.pdb
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/HopcroftKarp.dll
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/refint/HopcroftKarp.dll
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/HopcroftKarp.pdb
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/HopcroftKarp.genruntimeconfig.cache
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/obj/Debug/net10.0/ref/HopcroftKarp.dll
+/Users/max/Desktop/combinatory_algorithns/labs/lw6/HopcroftKarp/HopcroftKarp/bin/Debug/net10.0/input.txt

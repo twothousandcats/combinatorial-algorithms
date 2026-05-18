@@ -1,4 +1,4 @@
-﻿namespace HopkroftKarp;
+﻿namespace HopcroftKarp;
 
 public class HopcroftKarpMatcher
 {

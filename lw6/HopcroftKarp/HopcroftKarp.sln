@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HopcroftKarp", "HopcroftKarp\HopcroftKarp.csproj", "{E5E8B7C7-5751-480A-B9D1-1A9919E965F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HopcroftKarpTest", "HopcroftKarpTest\HopcroftKarpTest.csproj", "{86C5E7C4-A53C-4332-9A3C-EBD98D095645}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{E5E8B7C7-5751-480A-B9D1-1A9919E965F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5E8B7C7-5751-480A-B9D1-1A9919E965F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5E8B7C7-5751-480A-B9D1-1A9919E965F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86C5E7C4-A53C-4332-9A3C-EBD98D095645}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86C5E7C4-A53C-4332-9A3C-EBD98D095645}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86C5E7C4-A53C-4332-9A3C-EBD98D095645}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86C5E7C4-A53C-4332-9A3C-EBD98D095645}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
