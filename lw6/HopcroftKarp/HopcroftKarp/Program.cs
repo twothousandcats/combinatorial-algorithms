@@ -42,7 +42,7 @@ public class Program
         while ( iterator.MoveNext() )
         {
             ( int leftVertex, int rightVertex ) = ParseEdge( iterator.Current );
-            bipartiteGraph.AddEdge( leftVertex, rightVertex );
+            bipartiteGraph.AddEdge( leftVertex - 1, rightVertex - 1 );
             actualEdges++;
         }
 
@@ -131,15 +131,15 @@ public class Program
     {
         console.WriteLine( $"Pairs count: {result.Pairs.Count}" );
         console.WriteLine( $"is complete: {result.IsPerfect}" );
-        // List<string> chain = new List<string>( result.Pairs.Count * 2 );
+        List<string> chain = new List<string>( result.Pairs.Count * 2 );
         foreach ( KeyValuePair<int, int> pair in result.Pairs )
         {
-            console.WriteLine( $"chain: X{pair.Key} -> Y{pair.Value}" );
-            // chain.Add( $"X{pair.Key}" );
-            // chain.Add( $"Y{pair.Value}" );
+            console.WriteLine( $"chain: X{pair.Key + 1} -> Y{pair.Value + 1}" );
+            chain.Add( $"X{pair.Key + 1}" );
+            chain.Add( $"Y{pair.Value + 1}" );
         }
 
         console.WriteLine( "" );
-        // console.WriteLine( string.Join( " -> ", chain ) );
+        console.WriteLine( string.Join( " -> ", chain ) );
     }
 }
