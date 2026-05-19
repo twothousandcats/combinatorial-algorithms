@@ -131,7 +131,7 @@ public class Program
     {
         console.WriteLine( $"Pairs count: {result.Pairs.Count}" );
         console.WriteLine( $"is complete: {result.IsPerfect}" );
-        List<string> chain = new List<string>( result.Pairs.Count * 2 );
+        // List<string> chain = new List<string>( result.Pairs.Count * 2 );
         foreach ( KeyValuePair<int, int> pair in result.Pairs )
         {
             console.WriteLine( $"chain: X{pair.Key} -> Y{pair.Value}" );
@@ -140,6 +140,6 @@ public class Program
         }
 
         console.WriteLine( "" );
-        console.WriteLine( string.Join( " -> ", chain ) );
+        // console.WriteLine( string.Join( " -> ", chain ) );
     }
 }
