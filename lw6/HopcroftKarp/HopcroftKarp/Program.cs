@@ -129,15 +129,17 @@ public class Program
 
     private static void PrintResult( Matching result, IConsole console )
     {
-        console.WriteLine( $"Matching size: {result.Pairs.Count}" );
+        console.WriteLine( $"Pairs count: {result.Pairs.Count}" );
         console.WriteLine( $"is complete: {result.IsPerfect}" );
         List<string> chain = new List<string>( result.Pairs.Count * 2 );
-        foreach ( KeyValuePair<int, int> pair in result.Pairs.OrderBy( i => i.Key ) )
+        foreach ( KeyValuePair<int, int> pair in result.Pairs )
         {
-            chain.Add( $"X{pair.Key}" );
-            chain.Add( $"Y{pair.Value}" );
+            console.WriteLine( $"chain: X{pair.Key} -> Y{pair.Value}" );
+            // chain.Add( $"X{pair.Key}" );
+            // chain.Add( $"Y{pair.Value}" );
         }
 
+        console.WriteLine( "" );
         console.WriteLine( string.Join( " -> ", chain ) );
     }
 }
