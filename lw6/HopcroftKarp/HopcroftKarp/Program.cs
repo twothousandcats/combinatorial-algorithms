@@ -14,7 +14,7 @@ public class Program
             BipartiteGraph bipartiteGraph = ReadGraph();
             HopcroftKarpMatcher matcher = new HopcroftKarpMatcher( bipartiteGraph );
             Matching result = matcher.FindMaxChain();
-            PrintResult( result, console );
+            PrintResult( bipartiteGraph, result, console );
 
             return 0;
         }
@@ -127,19 +127,24 @@ public class Program
         return value;
     }
 
-    private static void PrintResult( Matching result, IConsole console )
+    private static void PrintResult( BipartiteGraph bipartiteGraph, Matching result, IConsole console )
     {
         console.WriteLine( $"Pairs count: {result.Pairs.Count}" );
         console.WriteLine( $"is complete: {result.IsPerfect}" );
-        List<string> chain = new List<string>( result.Pairs.Count * 2 );
         foreach ( KeyValuePair<int, int> pair in result.Pairs )
         {
-            console.WriteLine( $"chain: X{pair.Key + 1} -> Y{pair.Value + 1}" );
-            chain.Add( $"X{pair.Key + 1}" );
-            chain.Add( $"Y{pair.Value + 1}" );
+            console.WriteLine( $"Chain: {pair.Key + 1} -> {pair.Value + 1}" );
         }
 
-        console.WriteLine( "" );
-        console.WriteLine( string.Join( " -> ", chain ) );
+        IReadOnlyList<(bool isLeft, int index)> longestChain = new ChainFinder( bipartiteGraph, result ).FindLongest();
+
+        if ( longestChain.Count == 0 )
+        {
+        }
+
+        IEnumerable<string> chainParts =
+            longestChain.Select( vertex => $"{( vertex.isLeft ? "X" : "Y" )}{vertex.index + 1}" );
+
+        console.WriteLine( $"Longest chain: {string.Join( " -> ", chainParts )}" );
     }
 }
