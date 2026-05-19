@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HopcroftKarp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+318ec9f5c635079e2837cee038ae77102d5b257f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a2c660489511bc7aa0ebc049e5a05d3b0853fadf")]
 [assembly: System.Reflection.AssemblyProductAttribute("HopcroftKarp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HopcroftKarp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

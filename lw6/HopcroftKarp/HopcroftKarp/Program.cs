@@ -133,13 +133,15 @@ public class Program
         console.WriteLine( $"is complete: {result.IsPerfect}" );
         foreach ( KeyValuePair<int, int> pair in result.Pairs )
         {
-            console.WriteLine( $"Chain: {pair.Key + 1} -> {pair.Value + 1}" );
+            console.WriteLine( $"Chain: X{pair.Key + 1} -> Y{pair.Value + 1}" );
         }
 
-        IReadOnlyList<(bool isLeft, int index)> longestChain = new ChainFinder( bipartiteGraph, result ).FindLongest();
+        ChainFinder chainFinder = new ChainFinder( bipartiteGraph, result );
+        IReadOnlyList<(bool isLeft, int index)> longestChain = chainFinder.FindLongest();
 
         if ( longestChain.Count == 0 )
         {
+            console.WriteLine( "No longest chain" );
         }
 
         IEnumerable<string> chainParts =
